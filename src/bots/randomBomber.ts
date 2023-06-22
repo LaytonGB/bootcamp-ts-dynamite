@@ -19,7 +19,9 @@ class Bot {
 
         const [p2Spamming, p2SpamSelection] = this.p2IsSpamming(gamestate);
         if (p2Spamming) {
-            return this.getCounter(p2SpamSelection);
+            if (p2SpamSelection !== 'D' || theirBombs <= 0) {
+                return this.getCounter(p2SpamSelection);
+            }
         }
 
         if (myBombs > 0) {
