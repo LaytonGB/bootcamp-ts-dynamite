@@ -1,11 +1,13 @@
 import { BotSelection, Gamestate, Round } from '../models/gamestate';
 
-const randInt = (max) => {
-    return Math.floor(Math.random() * max);
+const randInt = (numberOfStates) => {
+    return Math.floor(Math.random() * numberOfStates);
 };
 
 class Bot {
     makeMove(gamestate: Gamestate): BotSelection {
+        let n = gamestate.rounds.length;
+        
         const wins = gamestate.rounds.reduce((w, r) => w + (this.p1DidWin(r) ? 1 : 0), 0);
         const remainingRounds = 1000 - wins;
         const { myBombs, theirBombs } = gamestate.rounds.reduce(
@@ -25,6 +27,12 @@ class Bot {
         }
 
         if (myBombs > 0) {
+            if (n === 1 && gamestate.rounds[n-1].p1 === 'D' || n >= 2 && gamestate.rounds[n-1].p1 === 'D' && gamestate.rounds[n-2].p1 !== "D") {
+                if (randInt(2) === 1) {
+                    return "D";
+                }
+            }
+
             const randBomb = randInt(remainingRounds);
             if (randBomb < myBombs) {
                 return "D";
