@@ -17,8 +17,8 @@ class Bot {
             { myBombs: 100, theirBombs: 100 }
         );
 
-        const [p2Spamming, p2SpamSelection] = this.p2IsSpamming(gamestate);
-        if (p2Spamming) {
+        const [spamLength, p2SpamSelection] = this.p2GetRepeatitionDetails(gamestate.rounds);
+        if (spamLength > 1) {
             if (p2SpamSelection !== 'D' || theirBombs <= 0) {
                 return this.getCounter(p2SpamSelection);
             }
@@ -35,7 +35,7 @@ class Bot {
         switch (randAction) {
             case 0: return "R";
             case 1: return "P";
-            default: return "S"; 
+            default: return "S";
         }
     }
 
@@ -54,11 +54,28 @@ class Bot {
         return false;
     }
 
-    p2IsSpamming(gamestate: Gamestate): [boolean, BotSelection | null] {
-        const n = gamestate.rounds.length;
-        const isSpamming = n >= 3
-            && gamestate.rounds[n-1].p2 === gamestate.rounds[n-2].p2;
-        return [isSpamming, isSpamming ? gamestate.rounds[n-1].p2 : null];
+    p2GetRepeatitionDetails(rounds: Round[]): [number, BotSelection | null] {
+        const n = rounds.length;
+
+        if (n === 0) {
+            return [0, null];
+        }
+
+        const spamValue = rounds[n - 1].p2;
+
+        if (spamValue === 'W') {
+            return [0, null];
+        }
+
+        let spamLength = 1;
+        for (let i = n - 2; i >= 0; i--) {
+            if (rounds[i].p2 === spamValue) {
+                spamLength += 1;
+            } else {
+                break;
+            }
+        }
+        return [spamLength, spamValue];
     }
 
     getCounter(action: BotSelection): BotSelection {
