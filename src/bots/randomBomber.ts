@@ -20,7 +20,7 @@ class Bot {
         const [spamLength, p2SpamSelection] = this.p2GetRepeatitionDetails(gamestate.rounds);
         if (spamLength > 1 && p2SpamSelection === 'D' && theirBombs > 0) {
             return this.getCounterMove(p2SpamSelection);
-        } else if (spamLength > 2 && p2SpamSelection !== 'D') {
+        } else if (spamLength > 4 && p2SpamSelection !== 'D') {
             return this.getCounterMove(p2SpamSelection);
         }
 
@@ -39,8 +39,7 @@ class Bot {
         }
     }
 
-    p1DidWin(round: Round): boolean {
-        const { p1, p2 } = round;
+    p1DidWin({ p1, p2 }: Round): boolean {
         if (
             p1 === "D" && p2 !== "W" && p2 !== "D"
             || p1 !== "D" && p1 !== "W" && p2 === "W"
