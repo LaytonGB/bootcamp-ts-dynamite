@@ -7,7 +7,7 @@ const randInt = (max) => {
 class Bot {
     makeMove(gamestate: Gamestate): BotSelection {
         const wins = gamestate.rounds.reduce((w, r) => w + (this.p1DidWin(r) ? 1 : 0), 0);
-        const remainingRounds = gamestate.rounds.length - wins;
+        const remainingRounds = 1000 - wins;
         const { myBombs, theirBombs } = gamestate.rounds.reduce(
             (b, { p1, p2 }) => {
                 b.myBombs -= p1 === "D" ? 1 : 0;
@@ -17,13 +17,16 @@ class Bot {
             { myBombs: 100, theirBombs: 100 }
         );
 
-        if (theirBombs > 0 && this.p2IsSpamming(gamestate)) {
-            return "W";
+        const [p2Spamming, p2SpamSelection] = this.p2IsSpamming(gamestate);
+        if (p2Spamming) {
+            return this.getCounter(p2SpamSelection);
         }
 
-        const randBomb = randInt(remainingRounds);
-        if (randBomb > myBombs) {
-            return "D";
+        if (myBombs > 0) {
+            const randBomb = randInt(remainingRounds);
+            if (randBomb < myBombs) {
+                return "D";
+            }
         }
 
         const randAction = randInt(3);
@@ -49,11 +52,21 @@ class Bot {
         return false;
     }
 
-    p2IsSpamming(gamestate: Gamestate): boolean {
+    p2IsSpamming(gamestate: Gamestate): [boolean, BotSelection | null] {
         const n = gamestate.rounds.length;
-        return n >= 3
-            && gamestate.rounds[n-1].p2 === "D"
-            && gamestate.rounds[n-2].p2 === "D";
+        const isSpamming = n >= 3
+            && gamestate.rounds[n-1].p2 === gamestate.rounds[n-2].p2;
+        return [isSpamming, isSpamming ? gamestate.rounds[n-1].p2 : null];
+    }
+
+    getCounter(action: BotSelection): BotSelection {
+        switch (action) {
+            case "D": return "W";
+            case "R": return "P";
+            case "P": return "S";
+            case "S": return "R";
+            default: throw new Error("No such counter move exists");
+        }
     }
 }
 
