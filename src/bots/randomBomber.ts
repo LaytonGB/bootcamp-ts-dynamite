@@ -18,10 +18,10 @@ class Bot {
         );
 
         const [spamLength, p2SpamSelection] = this.p2GetRepeatitionDetails(gamestate.rounds);
-        if (spamLength > 1) {
-            if (p2SpamSelection !== 'D' || theirBombs <= 0) {
-                return this.getCounter(p2SpamSelection);
-            }
+        if (spamLength > 1 && p2SpamSelection === 'D' && theirBombs > 0) {
+            return this.getCounterMove(p2SpamSelection);
+        } else if (spamLength > 2 && p2SpamSelection !== 'D') {
+            return this.getCounterMove(p2SpamSelection);
         }
 
         if (myBombs > 0) {
@@ -78,7 +78,7 @@ class Bot {
         return [spamLength, spamValue];
     }
 
-    getCounter(action: BotSelection): BotSelection {
+    getCounterMove(action: BotSelection): BotSelection {
         switch (action) {
             case "D": return "W";
             case "R": return "P";
